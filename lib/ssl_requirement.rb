@@ -22,9 +22,14 @@ require "#{File.dirname(__FILE__)}/url_rewriter"
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 module SslRequirement
   mattr_reader :ssl_host
+  mattr_reader :ssl_protocol
   
   def self.ssl_host=(host)
     @@ssl_host = host
+  end
+
+  def self.ssl_protocol=(protocol)
+    @@ssl_protocol = protocl
   end
   
   def self.included(controller)
@@ -78,7 +83,7 @@ module SslRequirement
       return true if ssl_allowed?
 
       if ssl_required? && !request.ssl?
-        redirect_to "https://" + (ssl_host || request.host) + request.request_uri
+        redirect_to (ssl_protocol || "https") + "://" + (ssl_host || request.host) + request.request_uri
         flash.keep
         return false
       elsif request.ssl? && !ssl_required?
